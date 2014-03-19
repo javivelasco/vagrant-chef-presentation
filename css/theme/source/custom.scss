@@ -39,6 +39,7 @@ em {
 }
 
 
+// Sorry for the SCSS, no time to do something better now
 .ffix {
   @include ffix;
 }
@@ -203,4 +204,18 @@ img.no-borders {
 #nginx-logo {
   margin-top: 40px;
   max-width: 250px;
+}
+
+.reveal:after {
+  bottom: 0;
+  color: $colorVagrant;
+  content: '@javivelasco';
+  font-size: .5em;
+  font-style: normal;
+  font-weight: bold;
+  left: 50%;
+  margin: 0 20px 20px -100px;
+  position: absolute;
+  text-align: center;
+  width: 200px;
 }

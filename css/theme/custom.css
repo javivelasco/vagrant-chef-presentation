@@ -274,3 +274,16 @@ img.no-borders {
 #nginx-logo {
   margin-top: 40px;
   max-width: 250px; }
+
+.reveal:after {
+  bottom: 0;
+  color: #2490cc;
+  content: '@javivelasco';
+  font-size: .5em;
+  font-style: normal;
+  font-weight: bold;
+  left: 50%;
+  margin: 0 20px 20px -100px;
+  position: absolute;
+  text-align: center;
+  width: 200px; }
