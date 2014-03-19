@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Automate your env with Vagrant and Chef</title>
+
+		<meta name="description" content="A presentation about automation with Vagrant and Chef for the 13th Betabeers ODB">
+		<meta name="author" content="Javier Velasco">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/custom.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section id="hola" data-background="images/chef-background-transparent.png">
+					<h2>Buenos días</h2>
+					<ul>
+						<li>Uno</li>
+						<li>Dos</li>
+						<li>Tres</li>
+						<li>Cuatro</li>
+					</ul>
+				</section>
+
+
+				<section id="welcome" data-background="images/vagrant-chef-background.png">
+					<h2>Automate your env</h2>
+					<h3>with Vagrant and Chef</span></h3>
+					<pre class="welcome"><code class="javascript" data-trim>
+var speaker = {
+	name: 'Javi Velasco',
+	twitter: '@javivelasco',
+	worksAt: 'imixme.com',
+	github: 'javivelasco',
+	blog: 'blog.javivelas.co'
+}
+					</code></pre>
+				</section>
+
+				<section id="about-me" data-background="/images/me-background.png">
+					<h2>Who's the geek?</h2>
+					<blockquote>&ldquo;@javivelasco, an aspiring web craftsman.&rdquo;</blockquote>
+
+					<p id="worked-intro">Former front-end developer turned to fullstack. I pleasently worked with <a href="www.floqq.com">Floqq</a>, <a href="www.mindster.org">Mindster</a> and now @ <a href="www.imixme.com">Imixme</a></p>
+					<ul id="worked-at">
+						<li><img src="images/floqq.png" /></li>
+						<li><img src="images/mindster.png" /></li>
+						<li><img src="images/imixme.png" /></li>
+					</ul>
+				</section>
+
+				<section id="problems">
+					<h2>Problems to solve</h2>
+					<ul>
+						<li><em>Multiple environments</em> that should be set up the same</li>
+						<li>Developers in a team with <em>different machines</em> or OS.</li>
+						<li>Run projects with <em>conflictive dependencies</em>.</li>
+						<li>Wanna <em>play</em> with new stuff without f***ing up your env.</li>
+					</ul>
+					<blockquote class="fragment">&ldquo;Is easy to run the stack @ local? -New developer&rdquo;</blockquote>
+					<blockquote class="fragment">&ldquo;Hey, this is not working for me!&rdquo; -Any developer</blockquote>
+				</section>
+
+				<section>
+
+					<section id="vagrant-welcome" data-background="images/vagrant-background.png">
+						<h2>Development environments made easy.</h2>
+					</section>
+
+					<section id="what-is-vagrant" data-background="images/vagrant-background-transparent.png">
+						<h2>What is Vagrant?</h2>
+						<p class="fragment">A software that provides a portable and reproducible environment using virtual machines. Automation tools are used for provisioning. All is set up in your project repository</p>
+						<pre class="code-wide fragment"><code class="javascript" data-trim>
+$ vagrant init imixme/precise32
+$ vagrant up
+$ vagrant ssh
+						</code></pre>
+					</section>
+
+					<section id="vagrant-terminology" data-background="images/vagrant-background-transparent.png">
+						<h2>Terminology</h2>
+						<ul>
+							<li><em>Boxes</em>: a bundle containing your OS image and metadata.</li>
+							<li><em>Host &amp; Guest</em>: host is the one who starts vagrant, guess the other one.</li>
+							<li><em>Providers</em>: handles the virtualization process.</li>
+							<li><em>Provisioners</em>: automates the setup by installing software and configuration.</li>
+							<li><em>Vagrant file</em>: hold the definition of the machine (Ruby)</li>
+							<li><em>Shared folder</em>: allows to edit your files in host while running in guest.</li>
+						</ul>
+					</section>
+
+					<section id="the-vagrantfile" data-background="images/vagrant-background-transparent.png">
+						<h2>VagrantFile</h2>
+						<pre class="vagrantfile"><code class="ruby" data-trim>
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "http://domain.com/path/to/above.box"
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "private_network", ip: "33.33.33.10"
+  config.ssh.forward_agent = true
+  config.vm.synced_folder "apps", "/apps"
+end
+						</code></pre>
+						<p>But here there is no configuration for software right?... Yep, but we can use shell scripts to run on vagrant up</p>
+					</section>
+
+					<section id="shell-provision" data-background="images/vagrant-background-transparent.png">
+						<h2>Shell script provision</h2>
+						<p>You can always use scripts to provision your vagrant machine but if you have a complex stack or configuration... it's kind of messy.</p>
+						<pre class="vagrantfile"><code class="ruby" data-trim>
+# provision inline
+config.vm.provision "shell", inline: "ls -la /vagrant"
+
+# provision by script
+config.vm.provision "shell", path: "script.sh"
+						</code></pre>
+						<p>Solution: use an IT automation tool</p>
+					</section>
+
+					<section id="vagrant-provisioners" data-background="images/vagrant-background-transparent.png">
+						<h2>Provisioners</h2>
+						<p>Without provisioners Vagrant wouldn't be the same. Constructing boxes and distribute them is as heavy as classic VM images. Vagrant supports, along with Shell scripts:</p>
+
+						<ul class="list-horizontal-images">
+							<li>
+								<img src="images/ansible-logo.png" />
+								<span>Ansible</span>
+							</li>
+							<li>
+								<img src="images/puppet-logo.png" />
+								<span>Puppet</span>
+							</li>
+							<li>
+								<img src="images/salt-logo.png" />
+								<span>Salt</span>
+							</li>
+							<li>
+								<img src="images/chef-logo.png" />
+								<span>Chef</span>
+							</li>
+						</ul>
+					</section>
+
+					<section id="vagrant-demo" data-background="images/vagrant-background-transparent.png">
+						<h1>Demo time</h1>
+						<p>Let's give a try to Vagrant command line and explore some options</p>
+					</section>
+				</section>
+
+				<section>
+
+					<section id="chef-welcome" data-background="/images/chef-background.png">
+						<h2>IT automation for speed and awesomeness</h2>
+					</section>
+
+					<section id="what-is-chef" data-background="/images/chef-background-transparent.png">
+						<h2>What is Chef</h2>
+						<p class="margins">Chef is a Ruby framework for automating, reusing and documenting server configuration. Two versions:</p>
+						<p class="color chef">Chef Server &amp; Client</p>
+						<p class="color chef fragment grow">Chef Solo</p>
+					</section>
+
+					<section id="what-chef-gives-you" data-background="/images/chef-background-transparent.png">
+						<h2>What Chef gives you</h2>
+						<ul>
+							<li><span class="color chef">Idempotence</span> (state behavior)</li>
+							<li>Standar directory structure for <span class="color chef">organization</span></li>
+							<li><span class="color chef">Sequential</span> execution order</li>
+							<li><span class="color chef">Templates</span> for config files</li>
+							<li>Open source &amp; big <span class="color chef">community</span></li>
+							<li><span class="color chef">Ruby</span> as scripting language</li>
+							<li>Configuration that is <span class="color chef">readable</span>, <span class="color chef">accesible</span> and <span class="color chef">repetible</span></li>
+						</ul>
+						<blockquote class="fragment ezra-quote">&ldquo;Chef is like unit testing for your servers&rdquo; <span>- Ezra Zygmuntowicz (CTO at Intridea)</span></blockquote>
+					</section>
+
+					<section id="chef-terminology" data-background="/images/chef-background-transparent.png">
+						<h2>Terminology</h2>
+						<ul>
+							<li><span class="color chef">Node</span> is where Chef runs.</li>
+							<li><span class="color chef">Recipe</span> is file of Ruby containing commands to run on a node.</li>
+							<li>A <span class="color chef">resource</span> includes files, directory, users and services.</li>
+							<li><span class="color chef">Cookbook</span> is a collection of recipes.</li>
+							<li><span class="color chef">Role</span> refers to reusable configuration for multiple nodes</li>
+							<li><span class="color chef">Run list</span> array of recipes and roles that define what should be executed on a node.</li>
+							<li><span class="color chef">Attributes</span> are variables used in recipes and templates.</li>
+							<li><span class="color chef">Templates</span> are .erb files with placeholders for attributes used to create configuration.</li>
+							<li>A <span class="color chef">notification</span> can trigger an update in resource when another resource is changed.</li>
+						</ul>
+					</section>
+
+					<section id="chef-nginx-recipe">
+						<h2>Let's see an example</h2>
+						<p>How can we install and run <a href="http://nginx.com/">nginx</a></p>
+						<img id="nginx-logo" class="no-borders" src="images/nginx-logo.png" alt="">
+					</section>
+
+					<section id="chef-nginx-cookbook-structure" data-background="/images/chef-background-transparent.png">
+						<h2>Cookbook structure</h2>
+						<p>Chef defines some diretories to structure your cookbooks.</p>
+						<pre class="code-wide"><code class="ruby" data-trim>
+	├── main
+	│   └── recipes
+	│       └── default.rb
+	└── nginx
+	    ├── attributes
+	    │   └── nginx.rb
+	    ├── recipes
+	    │   └── default.rb
+	    └── templates
+	        └── default
+	            └── nginx.conf.erb
+						</code></pre>
+					</section>
+
+					<section id="chef-nginx-default-recipe" data-background="/images/chef-background-transparent.png">
+						<h2>A simple recipe</h2>
+						<p>The code below installs nginx with the package built-in in the system, defines nginx as a service and sets a template to configure it.</p>
+						<pre class="code-wide"><code class="ruby" data-trim>
+	# nginx/recipes/default.rb
+	package "nginx"
+
+	service "nginx" do
+	    supports :status => true, :restart => true, :reload => true
+	    action [:enable, :start]
+	end
+
+	template "/etc/nginx/nginx.conf" do
+	    source "nginx.conf.erb"
+	    notifies :reload, "service[nginx]"
+	end
+						</code></pre>
+					</section>
+
+					<section id="chef-nginx-default-recipe-notes" data-background="/images/chef-background-transparent.png">
+						<h2>Note that...</h2>
+						<ul>
+							<li><span class="color chef">package</span> directive uses the default builtin packaging system. You can specify others i.e. RubyGems</li>
+							<li><span class="color chef">service</span> declares nginx as a service that can be manipulated from /etc/init.d/</li>
+							<li><span class="color chef">template</span> directive looks in default folder refering to a node, not a recipe. You can specify others.</li>
+							<li><span class="color chef">attribute</span> system in Chef is REALLY complex with about 15 layers of precedence.</li>
+						</ul>
+					</section>
+
+
+					<section id="chef-cookbook-main-recipe" data-background="/images/chef-background-transparent.png">
+						<h2>Add a main recipe</h2>
+						<p>It's not mandatory but always recommended. Useful for specific setup, for example, defining your specific recipe dependencies and update your package manager.</p>
+						<pre class="code-wide"><code class="ruby" data-trim>
+# update your package manager
+execute "apt-get update" do
+    command "apt-get update"
+end
+
+# dependencies for the proyect
+include_recipe "nginx"
+						</code></pre>
+					</section>
+
+					<section id="chef-run-cookbook" data-background="/images/chef-background-transparent.png">
+						<h2>Running..</h2>
+
+						<pre class="code-wide"><code class="bash" data-trim>
+$ gem install chef
+$ echo cookbooks_path "/cookbooks" > /etc/chef/solo.rb
+$ echo {"run-list": ["recipe[nginx]"]} > /etc/chef/node.json
+$ chef-solo -j /etc/chef/node.json
+						</code></pre>
+
+						<p>... and in the VagrantFile ...</p>
+						<pre class="code-wide"><code class="ruby" data-trim>
+# VagrantFile
+config.vm.provision :chef_solo do |chef|
+  chef.add_recipe "default"
+end
+						</code></pre>
+					</section>
+
+					<section id="chef-demo" data-background="/images/chef-background-transparent.png">
+						<h1>Demo time</h1>
+						<p>and other complex examples?</p>
+					</section>
+				</section>
+
+				<section id="conclusions" data-background="/images/vagrant-chef-background-transparent.png">
+					<h2>So... what do we get?</h2>
+					<ul>
+						<li>Fully <span class="color vagrant">working</span> and documented environment.</li>
+						<li>Ability to <span class="color vagrant">replicate</span> our environments easily.</li>
+						<li>An easy IT <span class="color vagrant">troubleshooting</span>.</li>
+						<li>... so you can experiment and <span class="color vagrant">destroy</span> everything.</li>
+						<li><span class="color vagrant">No worries</span> about IT issues, not anymore.</li>
+					</ul>
+				</section>
+
+				<section>
+					<section id="alternatives" data-background="/images/vagrant-chef-background-transparent.png">
+						<h2>Alternatives?</h2>
+						<p>Yep, you can get similar results with other tools, for example:</p>
+						<ul>
+							<li>Vagrant is the <span class="color vagrant">master</span>, but I also found <a href="https://github.com/websecurify/node-vortex">Vortex</a>.</li>
+							<li>We've already saw alternatives to Chef.</li>
+							<li>And the one who sounds better and maybe it's a <span class="color chef">Chef killer</span>...</li>
+						</ul>
+					</section>
+
+					<section id="docker-welcome" data-background="images/docker-background.png"></section>
+
+					<section id="what-is-docker" data-background="images/docker-background-transparent.png">
+						<h2>What's Docker?</h2>
+						<p>Docker is an open-source project to easily create lightweight, portable, self-sufficient containers from any application. The same container that a developer builds and tests on a laptop can run at scale, in production, on VMs, bare metal, OpenStack clusters, public clouds and more.</p>
+						<ul>
+							<li>In the end you have <span class="color vagrant">similar results</span>.</li>
+							<li>Really <span class="color vagrant">lightweight</span></li>
+							<li><span class="color vagrant">Scalable</span></li>
+						</ul>
+					</section>
+				</section>
+
+				<section id="resources" data-background="/images/vagrant-chef-background-transparent.png">
+					<h2>Some resources</h2>
+					<ul>
+						<li>Official sites for <a class="color vagrant" href="http://www.vagrantup.com/">Vagrant</a> and <a class="color vagrant" href="http://www.getchef.com/chef/">Chef</a></li>
+						<li>Peepcode <a class="color vagrant" href="https://peepcode.com/products/chef-i">screencast</a> series by Joshua Sierles</li>
+						<li><a class="color vagrant" href="http://railscasts.com/episodes/339-chef-solo-basics">Railscasts episode</a> about Chef Solo by Ryan Bates</li>
+						<li><a class="color vagrant" href="https://leanpub.com/vagrantcookbook">Vagrant cookbook</a> @leanpub by Erika Heidi</li>
+						<li>Collection of <a class="color vagrant" href="https://github.com/jsierles/chef_cookbooks">cookbooks</a> for Chef by Joshua Sierles</li>
+					</ul>
+				</section>
+
+				<section id="bye" data-background="/images/vagrant-chef-background-transparent.png">
+					<h1>Thanks!</h1>
+					<p>Any questions?</p>
+					<p>Find me at <a class="color vagrant" href="https://twitter.com/javivelasco">Twitter</a> or <a class="color vagrant" href="http://es.linkedin.com/in/javivelasco/">Linkedin</a></p>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: false,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+		</script>
+	</body>
+</html>

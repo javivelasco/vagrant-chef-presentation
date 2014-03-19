@@ -1,0 +1,206 @@
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(https://fonts.googleapis.com/css?family=Montserrat:700);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
+
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #E3E3E3;
+
+$mainFont: 'Open Sans', sans-serif;
+$mainColor: #444;
+$linkColor: #2490cc;
+$linkColorHover: lighten( $linkColor, 20% );
+$headingFont: 'Montserrat', Impact, sans-serif;
+$headingColor: #333;
+$headingTextShadow: none;
+$headingTextTransform: normal;
+$headingLetterSpacing: -0.03em;
+$headingTextTransform: none;
+$selectionBackgroundColor: #e7ad52;
+$mainFontSize: 30px;
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+$colorChef: #e3821e;
+$colorVagrant: #2490cc;
+
+em {
+  color: $colorVagrant;
+  font-style: normal !important;
+}
+
+
+.ffix {
+  @include ffix;
+}
+
+pre.welcome {
+  font-size: 1em;
+  width: 120%;
+  margin-left: -10%;
+  margin-top: 110px;
+  & code {
+    padding: 10px 15%;
+  }
+}
+
+#container {
+  display: block;
+  width: 100%;
+  position: relative;
+
+  header {
+    text-align: center;
+    position: absolute;
+    left: 34%;
+    width: 66%;
+    top: 20%;
+  }
+
+  img {
+    float: left;
+    border: 0;
+    box-shadow: none;
+    background: none;
+    &.vagrant {
+      margin: 0;
+      width: 80%;
+      margin-left: -25%
+    }
+    &.chef {
+      position: absolute;
+      width: 13%;
+      left: 25%;
+      bottom: 0;
+    }
+  }
+}
+
+.color.vagrant { color: $colorVagrant; font-weight: bold; }
+.color.chef { color: $colorChef; font-weight: bold; }
+
+#worked-at {
+  margin: 0;
+  li {
+    list-style: none;
+    margin-left: 0;
+    display: inline-block;
+    &:not(:last-child) {
+      margin-right: 30px;
+    }
+  }
+  img {
+    width: 120px;
+    border: 0;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+}
+
+#worked-intro {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+#problems {
+  margin-bottom: 30px;
+  & > li {
+    margin-top: 5px;
+  }
+  blockquote {
+    margin-top: 35px;
+  }
+}
+
+#what-is-vagrant p {
+  margin: 30px 0;
+}
+
+.background-transparent .reveal:after {
+  content: "";
+  background-color: white;
+
+  opacity: 0.3;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.background-transparent #what-is-vagrant {
+  z-index: 200;
+}
+
+.vagrantfile {
+  font-size: .8em !important;
+}
+
+.list-horizontal-images {
+  margin: 0;
+  li {
+    list-style: none;
+    margin-left: 0;
+    display: inline-block;
+    &:not(:last-child) {
+      margin-right: 30px;
+    }
+    img {
+      width: 120px;
+      border: 0;
+      border-radius: 4px;
+      box-shadow: none;
+    }
+    span {
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+  }
+}
+
+p.margins {
+  margin-top: 30px !important;
+  margin-bottom: 30px !important;
+}
+
+.ezra-quote {
+  margin-top: 30px !important;
+
+  span {
+    display: block;
+    margin-top: 20px;
+    text-align: right;
+    font-size: .8em;
+  }
+}
+
+pre.code-wide {
+  font-size: .7em;
+  width: 120%;
+  margin-left: -10%;
+  & code {
+    padding: 10px 15%;
+  }
+}
+
+img.no-borders {
+  box-shadow: none !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+#nginx-logo {
+  margin-top: 40px;
+  max-width: 250px;
+}
